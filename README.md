@@ -137,3 +137,4 @@ Inspired by modern AI writing tools and content creation platforms.
 ---
 
 **Note**: This is a demo application with simulated AI responses. For production use, integrate with a real AI API like OpenAI or Anthropic.
+# writespire
