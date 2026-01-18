@@ -85,6 +85,30 @@
   --z-tooltip: 1060;
 }
 
+[data-theme='dark'] {
+  /* Dark Theme Colors */
+  --color-bg-primary: hsl(240, 10%, 10%);
+  --color-bg-secondary: hsl(240, 10%, 14%);
+  --color-bg-tertiary: hsl(240, 10%, 18%);
+  --color-bg-elevated: hsl(240, 10%, 20%);
+
+  /* Text Colors */
+  --color-text-primary: hsl(0, 0%, 95%);
+  --color-text-secondary: hsl(240, 5%, 70%);
+  --color-text-tertiary: hsl(240, 5%, 50%);
+  --color-text-muted: hsl(240, 5%, 40%);
+
+  /* Border Colors */
+  --color-border: hsl(240, 10%, 25%);
+  --color-border-light: hsl(240, 10%, 30%);
+
+  /* Shadows for Dark Mode */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
 /* Reset & Base Styles */
 * {
   margin: 0;
@@ -144,7 +168,7 @@ body {
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--color-bg-secondary);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-md) var(--space-xl);
@@ -868,4 +892,145 @@ body {
 
 .mt-auto {
   margin-top: auto;
+}
+
+/* Document Switcher */
+.document-switcher {
+  position: relative;
+  min-width: 200px;
+}
+
+.document-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.document-selector:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.current-doc-title {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.dropdown-arrow {
+  font-size: 0.8em;
+  color: var(--color-text-tertiary);
+}
+
+.document-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 300px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  margin-top: var(--space-xs);
+  z-index: var(--z-dropdown);
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-header {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+}
+
+.btn-text:hover {
+  background: rgba(160, 100, 255, 0.1);
+}
+
+.document-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: var(--space-xs);
+}
+
+.document-item {
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-xs);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all var(--transition-base);
+}
+
+.document-item:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.document-item.active {
+  background: rgba(160, 100, 255, 0.1);
+}
+
+.document-item.active .doc-item-title {
+  color: var(--color-primary);
+}
+
+.doc-item-title {
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: var(--space-sm);
+}
+
+.doc-item-date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-right: var(--space-sm);
+}
+
+.delete-doc-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  font-size: 1rem;
+}
+
+.document-item:hover .delete-doc-btn {
+  opacity: 1;
+}
+
+.delete-doc-btn:hover {
+  transform: scale(1.1);
 }

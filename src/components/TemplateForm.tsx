@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import type { Template } from '../types';
+import { useState, useEffect } from 'react';
+import type { Template, Document } from '../types';
+import { getAllDocuments } from '../utils/storage';
 
 interface TemplateFormProps {
     template: Template;
@@ -13,6 +14,18 @@ export const TemplateForm: React.FC<TemplateFormProps> = ({
     isGenerating,
 }) => {
     const [inputs, setInputs] = useState<Record<string, string>>({});
+    const [availableOutlines, setAvailableOutlines] = useState<Document[]>([]);
+
+    useEffect(() => {
+        if (template.inputs.some(input => input.type === 'outline-select')) {
+            const docs = getAllDocuments();
+            // Filter documents that contain blog outlines
+            const outlineDocs = docs.filter(doc =>
+                doc.contents.some(content => content.templateId === 'blog-post-outline')
+            );
+            setAvailableOutlines(outlineDocs);
+        }
+    }, [template]);
 
     const handleInputChange = (id: string, value: string) => {
         setInputs((prev) => ({ ...prev, [id]: value }));
@@ -103,6 +116,39 @@ export const TemplateForm: React.FC<TemplateFormProps> = ({
                                 value={inputs[input.id] || ''}
                                 onChange={(e) => handleInputChange(input.id, e.target.value)}
                             />
+                        )}
+
+                        {input.type === 'outline-select' && (
+                            <div className="outline-select-container">
+                                <select
+                                    id={input.id}
+                                    className="form-select"
+                                    value={inputs[input.id] || ''}
+                                    onChange={(e) => handleInputChange(input.id, e.target.value)}
+                                >
+                                    <option value="">{input.placeholder || 'Select an outline'}</option>
+                                    {availableOutlines.length > 0 ? (
+                                        availableOutlines.map((doc) => {
+                                            const outlineContent = doc.contents.find(c => c.templateId === 'blog-post-outline');
+                                            return (
+                                                <option key={doc.id} value={outlineContent?.content || ''}>
+                                                    {doc.title} ({new Date(doc.updatedAt).toLocaleDateString()})
+                                                </option>
+                                            );
+                                        })
+                                    ) : (
+                                        <option value="" disabled>No outlines found. Generate one first!</option>
+                                    )}
+                                </select>
+                                {inputs[input.id] && (
+                                    <div className="outline-preview">
+                                        <p className="outline-preview-label">Selected Outline Preview:</p>
+                                        <div className="outline-preview-content">
+                                            {inputs[input.id].substring(0, 150)}...
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
                 ))}

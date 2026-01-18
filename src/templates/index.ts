@@ -15,6 +15,18 @@ export const templates: Template[] = [
         ],
     },
     {
+        id: 'blog-post-from-outline',
+        name: 'Full Blog Post from Outline',
+        description: 'Write a full blog post based on your generated outline',
+        category: 'blog',
+        icon: '📄',
+        inputs: [
+            { id: 'outline', label: 'Select Outline', type: 'outline-select', required: true, placeholder: 'Choose an outline...' },
+            { id: 'wordCount', label: 'Approx. Word Count', type: 'select', options: ['Short (500-800 words)', 'Medium (800-1500 words)', 'Long (1500+ words)'], required: true },
+            { id: 'tone', label: 'Tone', type: 'select', options: ['Professional', 'Casual', 'Friendly', 'Authoritative', 'Storytelling'], required: true },
+        ],
+    },
+    {
         id: 'blog-post-intro',
         name: 'Blog Post Introduction',
         description: 'Create an engaging introduction for your blog post',

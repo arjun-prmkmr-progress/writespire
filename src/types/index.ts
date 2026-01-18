@@ -1,7 +1,7 @@
 export interface InputField {
   id: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'number';
+  type: 'text' | 'textarea' | 'select' | 'number' | 'outline-select';
   placeholder?: string;
   options?: string[];
   required?: boolean;

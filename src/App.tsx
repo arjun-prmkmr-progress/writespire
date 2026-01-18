@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Template, GeneratedContent, Document } from './types';
 import { generateContent } from './utils/aiSimulator';
-import { saveDocument, exportDocument } from './utils/storage';
+import { saveAllDocuments, getAllDocuments, exportDocument } from './utils/storage';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { TemplateForm } from './components/TemplateForm';
@@ -9,20 +9,106 @@ import { OutputDisplay } from './components/OutputDisplay';
 import './App.css';
 
 function App() {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark') return saved;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [currentDocumentId, setCurrentDocumentId] = useState<string>('');
+
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedVariations, setGeneratedVariations] = useState<string[]>([]);
-  const [currentDocument, setCurrentDocument] = useState<Document>({
+  const [showToast, setShowToast] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
+
+  const createNewDocument = (): Document => ({
     id: crypto.randomUUID(),
     title: 'Untitled Document',
     contents: [],
     createdAt: Date.now(),
     updatedAt: Date.now(),
   });
-  const [showToast, setShowToast] = useState<{
-    message: string;
-    type: 'success' | 'error';
-  } | null>(null);
+
+  useEffect(() => {
+    const docs = getAllDocuments();
+    if (docs.length > 0) {
+      setDocuments(docs);
+      const mostRecent = docs.sort((a, b) => b.updatedAt - a.updatedAt)[0];
+      setCurrentDocumentId(mostRecent.id);
+    } else {
+      const newDoc = createNewDocument();
+      setDocuments([newDoc]);
+      setCurrentDocumentId(newDoc.id);
+      saveAllDocuments([newDoc]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (documents.length > 0) {
+      saveAllDocuments(documents);
+    }
+  }, [documents]);
+
+  const currentDocument = useMemo(() => {
+    return documents.find(d => d.id === currentDocumentId) || (documents.length > 0 ? documents[0] : null);
+  }, [documents, currentDocumentId]);
+
+  const safeCurrentDocument = currentDocument || {
+    id: 'temp',
+    title: 'Loading...',
+    contents: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  const handleNewDocument = () => {
+    const newDoc = createNewDocument();
+    setDocuments(prev => [...prev, newDoc]);
+    setCurrentDocumentId(newDoc.id);
+    setSelectedTemplate(null);
+    setGeneratedVariations([]);
+  };
+
+  const handleSwitchDocument = (id: string) => {
+    setCurrentDocumentId(id);
+    setSelectedTemplate(null);
+    setGeneratedVariations([]);
+  };
+
+  const handleDeleteDocument = (id: string) => {
+    if (documents.length <= 1) {
+      showToastMessage('Cannot delete the last document', 'error');
+      return;
+    }
+
+    const newDocs = documents.filter(d => d.id !== id);
+    setDocuments(newDocs);
+
+    if (currentDocumentId === id) {
+      const mostRecent = newDocs.sort((a, b) => b.updatedAt - a.updatedAt)[0];
+      setCurrentDocumentId(mostRecent.id);
+    }
+    showToastMessage('Document deleted', 'success');
+  };
 
   const handleTemplateSelect = (template: Template) => {
     setSelectedTemplate(template);
@@ -39,20 +125,24 @@ function App() {
       const variations = await generateContent(selectedTemplate, inputs);
       setGeneratedVariations(variations);
 
-      // Add to document
       const newContent: GeneratedContent = {
         id: crypto.randomUUID(),
         templateId: selectedTemplate.id,
         templateName: selectedTemplate.name,
-        content: variations[0], // Save first variation
+        content: variations[0],
         inputs,
         timestamp: Date.now(),
       };
 
-      setCurrentDocument((prev) => ({
-        ...prev,
-        contents: [...prev.contents, newContent],
-        updatedAt: Date.now(),
+      setDocuments(prev => prev.map(doc => {
+        if (doc.id === currentDocumentId) {
+          return {
+            ...doc,
+            contents: [...doc.contents, newContent],
+            updatedAt: Date.now()
+          };
+        }
+        return doc;
       }));
 
       showToastMessage('Content generated successfully!', 'success');
@@ -65,32 +155,37 @@ function App() {
   };
 
   const handleRegenerate = () => {
-    // Trigger regeneration with the same inputs
-    const lastContent = currentDocument.contents[currentDocument.contents.length - 1];
+    const lastContent = safeCurrentDocument.contents[safeCurrentDocument.contents.length - 1];
     if (lastContent) {
       handleGenerate(lastContent.inputs);
     }
   };
 
   const handleSave = () => {
-    saveDocument(currentDocument);
-    showToastMessage('Document saved!', 'success');
+    saveAllDocuments(documents);
+    showToastMessage('All documents saved!', 'success');
   };
 
-  const handleExport = () => {
-    if (currentDocument.contents.length === 0) {
+  const handleExport = async () => {
+    if (safeCurrentDocument.contents.length === 0) {
       showToastMessage('No content to export', 'error');
       return;
     }
-    exportDocument(currentDocument);
-    showToastMessage('Document exported!', 'success');
+    try {
+      await exportDocument(safeCurrentDocument);
+      showToastMessage('Document exported!', 'success');
+    } catch (error) {
+      console.error('Export error:', error);
+      showToastMessage('Failed to export document', 'error');
+    }
   };
 
   const handleTitleChange = (title: string) => {
-    setCurrentDocument((prev) => ({
-      ...prev,
-      title,
-      updatedAt: Date.now(),
+    setDocuments(prev => prev.map(doc => {
+      if (doc.id === currentDocumentId) {
+        return { ...doc, title, updatedAt: Date.now() };
+      }
+      return doc;
     }));
   };
 
@@ -102,10 +197,17 @@ function App() {
   return (
     <div className="app">
       <Header
-        documentTitle={currentDocument.title}
+        documentTitle={safeCurrentDocument.title}
         onTitleChange={handleTitleChange}
         onSave={handleSave}
         onExport={handleExport}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        documents={documents}
+        currentDocumentId={currentDocumentId}
+        onNewDocument={handleNewDocument}
+        onSwitchDocument={handleSwitchDocument}
+        onDeleteDocument={handleDeleteDocument}
       />
       <div className="main-layout">
         <Sidebar

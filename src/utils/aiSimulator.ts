@@ -15,6 +15,10 @@ export const generateContent = async (
             variations.push(generateBlogOutline(inputs));
             variations.push(generateBlogOutline(inputs, true));
             break;
+        case 'blog-post-from-outline':
+            variations.push(generateFullBlogPost(inputs));
+            variations.push(generateFullBlogPost(inputs, true));
+            break;
         case 'blog-post-intro':
             variations.push(generateBlogIntro(inputs));
             variations.push(generateBlogIntro(inputs, true));
@@ -571,4 +575,111 @@ function generateAdHeadlines(inputs: Record<string, string>): string {
 15. Join Thousands Using ${product}
 
 Mix and match these headlines with your ad copy for maximum impact!`;
+}
+
+function generateFullBlogPost(inputs: Record<string, string>, alt = false): string {
+    const outline = inputs.outline || '';
+    const wordCount = inputs.wordCount || 'Medium';
+    const tone = inputs.tone || 'Professional';
+
+    // Simple parsing of the outline to extract title and sections
+    const lines = outline.split('\n');
+    const title = lines.find(l => l.startsWith('# '))?.replace('# ', '') || 'Blog Post';
+
+    // Extract sections (simple heuristic looking for ## headers)
+    const sections: { title: string, points: string[] }[] = [];
+    let currentSection = { title: '', points: [] as string[] };
+
+    lines.forEach(line => {
+        if (line.startsWith('## ')) {
+            if (currentSection.title) {
+                sections.push(currentSection);
+            }
+            currentSection = { title: line.replace('## ', ''), points: [] };
+        } else if (line.trim().startsWith('- ') || line.trim().startsWith('• ')) {
+            currentSection.points.push(line.replace(/^[-•]\s+/, ''));
+        }
+    });
+    if (currentSection.title) {
+        sections.push(currentSection);
+    }
+
+    // Generate content based on sections
+    let content = `# ${title}\n\n`;
+
+    /* 
+       Simulator logic: 
+       We'll generate filler content that looks realistic based on the section titles and points.
+       In a real app, this would be an LLM call.
+    */
+
+    const introPhrases = [
+        `In today's fast-paced world, ${title.toLowerCase()} is more relevant than ever.`,
+        `Have you ever wondered about ${title.toLowerCase()}? You're not alone.`,
+        `Let's dive deep into the world of ${title.toLowerCase()}.`
+    ];
+
+    const transitionPhrases = [
+        "Furthermore,",
+        "In addition to this,",
+        "Another key aspect to consider is,",
+        "Moreover,",
+        "It's also worth noting that,"
+    ];
+
+    const conclusionPhrases = [
+        "In conclusion,",
+        "To wrap things up,",
+        "As we've seen,",
+        "Finally,"
+    ];
+
+    // Adjust content based on tone
+    const useFormalTone = tone === 'Professional' || tone === 'Authoritative';
+
+    // Introduction (if not explicitly in sections, though outlines usually have them)
+    if (!sections.some(s => s.title.toLowerCase().includes('introduction'))) {
+        content += `${alt ? introPhrases[1] : introPhrases[0]} This comprehensive guide will walk you through everything you need to know.\n\n`;
+    }
+
+    sections.forEach((section) => {
+        content += `## ${section.title}\n\n`;
+
+        section.points.forEach((point, pIndex) => {
+            // Generate a paragraph for each point
+            const pointIntro = point.split(':')[0] || point;
+
+            // Varied intro based on tone
+            if (useFormalTone) {
+                content += `### ${pointIntro}\n\n`;
+                content += `${point}. This concept is integral to understanding the broader subject matter. Professionals in the field consistently rely on this framework.\n\n`;
+            } else {
+                content += `### ${pointIntro}\n\n`;
+                content += `${point}. It's kind of like a secret weapon. Once you get this, everything else clicks.\n\n`;
+            }
+
+            // use transition phrases to avoid lint errors and add variety
+            if (pIndex > 0 && !useFormalTone) {
+                content += `${transitionPhrases[pIndex % transitionPhrases.length]} it helps to keep the big picture in mind.\n\n`;
+            }
+
+            // Add more content for longer word counts
+            if ((wordCount.includes('Long') || wordCount.includes('Medium')) && !alt) {
+                content += `To elaborate further, consider the implications of this in a real-world scenario. The data suggests that focusing on this area yields significant returns.\n\n`;
+            }
+            if (wordCount.includes('Long') && alt) {
+                content += `Furthermore, deep diving into this aspect reveals layers of complexity that, when mastered, provide a competitive edge.\n\n`;
+            }
+        });
+
+        content += '\n';
+    });
+
+    // Add Conclusion if missing
+    if (!sections.some(s => s.title.toLowerCase().includes('conclusion'))) {
+        content += `## Conclusion\n\n`;
+        content += `${useFormalTone ? conclusionPhrases[0] : conclusionPhrases[1]} we can see that ${title.toLowerCase()} is a multifaceted topic. By applying these insights, you can expect to see tangible results.\n\n`;
+    }
+
+    return content;
 }
