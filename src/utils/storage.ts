@@ -1,4 +1,4 @@
-import type { Document, GeneratedContent } from '../types';
+import type { Document } from '../types';
 
 const STORAGE_KEY = 'jasper-clone-documents';
 
