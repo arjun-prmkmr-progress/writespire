@@ -7,34 +7,34 @@
   --color-primary-dark: hsl(260, 85%, 50%);
   --color-secondary: hsl(220, 90%, 60%);
   --color-accent: hsl(280, 80%, 65%);
-  
+
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, hsl(260, 85%, 60%) 0%, hsl(220, 90%, 60%) 100%);
   --gradient-secondary: linear-gradient(135deg, hsl(280, 80%, 65%) 0%, hsl(260, 85%, 60%) 100%);
   --gradient-accent: linear-gradient(135deg, hsl(300, 75%, 60%) 0%, hsl(260, 85%, 60%) 50%, hsl(220, 90%, 60%) 100%);
-  
-  /* Dark Theme Colors */
-  --color-bg-primary: hsl(240, 15%, 8%);
-  --color-bg-secondary: hsl(240, 12%, 12%);
-  --color-bg-tertiary: hsl(240, 10%, 16%);
-  --color-bg-elevated: hsl(240, 12%, 18%);
-  
+
+  /* Light Theme Colors */
+  --color-bg-primary: hsl(0, 0%, 98%);
+  --color-bg-secondary: hsl(0, 0%, 100%);
+  --color-bg-tertiary: hsl(240, 20%, 97%);
+  --color-bg-elevated: hsl(0, 0%, 100%);
+
   /* Text Colors */
-  --color-text-primary: hsl(0, 0%, 98%);
-  --color-text-secondary: hsl(0, 0%, 75%);
-  --color-text-tertiary: hsl(0, 0%, 55%);
-  --color-text-muted: hsl(0, 0%, 40%);
-  
+  --color-text-primary: hsl(240, 15%, 15%);
+  --color-text-secondary: hsl(240, 10%, 35%);
+  --color-text-tertiary: hsl(240, 8%, 50%);
+  --color-text-muted: hsl(240, 5%, 60%);
+
   /* Border Colors */
-  --color-border: hsl(240, 10%, 25%);
-  --color-border-light: hsl(240, 8%, 30%);
-  
+  --color-border: hsl(240, 15%, 88%);
+  --color-border-light: hsl(240, 10%, 92%);
+
   /* Status Colors */
   --color-success: hsl(140, 70%, 55%);
   --color-warning: hsl(40, 95%, 60%);
   --color-error: hsl(0, 75%, 60%);
   --color-info: hsl(200, 80%, 60%);
-  
+
   /* Spacing System */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
@@ -43,11 +43,11 @@
   --space-xl: 2rem;
   --space-2xl: 3rem;
   --space-3xl: 4rem;
-  
+
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-serif: 'Merriweather', Georgia, serif;
-  
+
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -56,26 +56,26 @@
   --font-size-2xl: 1.5rem;
   --font-size-3xl: 2rem;
   --font-size-4xl: 2.5rem;
-  
+
   /* Border Radius */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-full: 9999px;
-  
+
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px rgba(160, 100, 255, 0.4);
-  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(160, 100, 255, 0.2);
+
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Z-index */
   --z-dropdown: 1000;
   --z-sticky: 1020;
@@ -144,7 +144,7 @@ body {
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: rgba(20, 18, 30, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-md) var(--space-xl);
@@ -152,6 +152,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .header-left {
@@ -593,6 +594,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -755,6 +757,7 @@ body {
     transform: translateX(400px);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -780,9 +783,9 @@ body {
 
 /* Glassmorphism Card */
 .glass-card {
-  background: rgba(30, 27, 45, 0.6);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(160, 100, 255, 0.1);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
 }
@@ -792,7 +795,7 @@ body {
   .sidebar {
     width: 280px;
   }
-  
+
   .editor-container {
     padding: var(--space-xl);
   }
@@ -807,24 +810,24 @@ body {
     z-index: var(--z-modal);
     transition: left var(--transition-base);
   }
-  
+
   .sidebar.open {
     left: 0;
   }
-  
+
   .header {
     padding: var(--space-md);
   }
-  
+
   .document-title {
     min-width: 150px;
     font-size: var(--font-size-base);
   }
-  
+
   .editor-container {
     padding: var(--space-lg);
   }
-  
+
   .template-form-title {
     font-size: var(--font-size-2xl);
   }
